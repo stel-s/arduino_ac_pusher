@@ -13,6 +13,7 @@ void setup()
   
   Serial.begin(9600);
  pinMode(8,OUTPUT);
+ pinMode(9,OUTPUT); 
   byte mac[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };
   if (Ethernet.begin(mac) == 0)
   {
@@ -27,9 +28,9 @@ void setup()
   }
   // Pusher.subscribe("test_channel");
   // Pusher.bind("my_event",read);
-   client.subscribe("ac_channel");
-    client.bind("turnon", turnOn);
-    client.bind("turnoff", turnOff);
+   Pusher.subscribe("ac_channel");
+    Pusher.bind("turnon", turnon);
+    Pusher.bind("turnoff", turnoff);
   //Pusher.triggerPrivateEvent("private-ChannelName", "client-eventName", "\"\"");
  //Pusher.triggerPrivateEvent("private-ChannelName", "client-eventName", "\"1\"");
 
@@ -53,20 +54,44 @@ void setup()
           
      }
   }
+  unsigned long lasttime;
 void loop() 
   {   
+    Serial.println(Pusher.connected());
   //TODO checkConnected();
   //if false reconnect();
-  
-    Pusher.monitor();  
-   int lasttime;
+  if(!Pusher.connected()){
+      digitalWrite(9,HIGH);
+      Pusher.disconnect();
+      }else {
+    Pusher.monitor();      
+    digitalWrite(9,LOW);
+      }
+    Pusher.monitor();   
 
   unsigned long time = millis();  
-    if (time > lasttime + 1000)
+    if (time > lasttime + 100000)
     {
+      
+    Serial.println(Pusher.connected());
+      lasttime = time;
+      Serial.println(time);
+      if(!Pusher.connected()){
+      while(!Pusher.connect()){
+    Serial.println("not connected");
+ 
+  delay(2000);
+   Serial.println("reconnectin");
+  }
+      Pusher.connect();
+       Pusher.subscribe("ac_channel");
+    Pusher.bind("turnon", turnon);
+    Pusher.bind("turnoff", turnoff);
+      
       //client.unsubscribe("my-channel"); 
     //signalActualState();
-    lasttime = time;
+    
+    }
     }
 }
 
