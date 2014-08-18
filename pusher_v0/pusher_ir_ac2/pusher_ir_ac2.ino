@@ -63,8 +63,9 @@ void loop()
   if(!Pusher.connected()){
       digitalWrite(9,HIGH);
       Pusher.disconnect();
+      
       }else {
-    Pusher.monitor();      
+   // Pusher.monitor();      
     digitalWrite(9,LOW);
       }
     Pusher.monitor();   
@@ -73,15 +74,15 @@ void loop()
     if (time > lasttime + 100000)
     {
       
-    Serial.println(Pusher.connected());
+    
       lasttime = time;
       Serial.println(time);
       if(!Pusher.connected()){
       while(!Pusher.connect()){
-    Serial.println("not connected");
+    Serial.println(F("not connected"));
  
   delay(2000);
-   Serial.println("reconnectin");
+   Serial.println(F("reconnectin"));
   }
       Pusher.connect();
        Pusher.subscribe("ac_channel");
