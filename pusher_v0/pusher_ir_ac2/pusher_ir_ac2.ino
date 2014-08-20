@@ -5,12 +5,17 @@
 #include <IRremote.h>
 
 IRsend irsend;
-unsigned int powerOn[60]={8400,4200,550,1600,550,550,550,550,550,550,500,1600,550,600,500,550,550,550,550,550,500,550,550,550,550,550,500,600,500,550,550,550,550,550,500,550,550,1600,600,1550,600,1600,550,550,550,550,500,1600,600,550,500,1600,600,550,500,550,550,1600,550};
-unsigned int powerOff[60]={8400,4200,550,1600,550,550,550,500,600,500,550,1600,600,500,550,550,550,500,600,1600,550,1600,550,550,550,500,600,500,550,550,550,550,550,500,600,500,550,550,550,500,600,500,550,550,550,1600,550,550,550,1600,550,550,550,550,550,500,550,1600,600};
+    int freeRam ()
+    {
+    extern int __heap_start, *__brkval;
+    int v;
+    return (int) &v - (__brkval == 0 ? (int) &__heap_start : (int) __brkval);
+    }
 
 void setup() 
 {
-  
+
+      freeRam();
   Serial.begin(9600);
  pinMode(8,OUTPUT);
  pinMode(9,OUTPUT); 
@@ -21,60 +26,95 @@ void setup()
   }
   //TODO try connecting until success
   while(!Pusher.connect()){
-    Serial.println("not connected");
+    Serial.println(F("not connected"));
  
   delay(2000);
-   Serial.println("reconnectin");
+   Serial.println(F("reconnectin"));
   }
-  // Pusher.subscribe("test_channel");
-  // Pusher.bind("my_event",read);
-   Pusher.subscribe("ac_channel");
-    Pusher.bind("turnon", turnon);
+    // Pusher.subscribe("test_channel");
+    // Pusher.bind("my_event",read);
+    Pusher.subscribe("ac_channel");
+    Pusher.bind("turnon", read);
     Pusher.bind("turnoff", turnoff);
-  //Pusher.triggerPrivateEvent("private-ChannelName", "client-eventName", "\"\"");
- //Pusher.triggerPrivateEvent("private-ChannelName", "client-eventName", "\"1\"");
-
+    //Pusher.triggerPrivateEvent("private-ChannelName", "client-eventName", "\"\"");
+    //Pusher.triggerPrivateEvent("private-ChannelName", "client-eventName", "\"1\"");
+    Serial.println(freeRam());
 }
-
+void topntail(char *str) {
+    size_t len = strlen(str);
+     // or whatever you want to do with short strings
+    memmove(str, str+1, len-2);
+    str[len-2] = 0;
+}
   void read(const String& name,const String& data){
-    Serial.println(data);
+    String dat=data;
+    char myArray[dat.length()+1];
+    strcpy(myArray, dat.c_str());
+    Serial.println(freeRam());
+    
+    topntail(myArray);
+    char *array[59];
+    int i=0;
+    array[i]=strtok(myArray,",");
+    unsigned int power[58];
+    power[i]=atoi(array[i]);
+    
+    while(array[i]!=NULL){
+         //puts(array[i]);
+        
+        i++; //or array[++i]
+        array[i]=strtok(NULL,",");;
+       power[i-1]=atoi(array[i-1]);
+       
+        
+    }
+    
+    
+    Serial.print(F(","));  
+    Serial.print((power[22]));
+    
   }
   void turnon(const String& name,const String& data){
-     digitalWrite(8,HIGH);
+//unsigned int powerOn[60]={8400,4200,550,1600,550,550,550,550,550,550,500,1600,550,600,500,550,550,550,550,550,500,550,550,550,550,550,500,600,500,550,550,550,550,550,500,550,550,1600,600,1550,600,1600,550,550,550,550,500,1600,600,550,500,1600,600,550,500,550,550,1600,550};
+Serial.print(data);
+Serial.println(freeRam());
+    digitalWrite(8,HIGH);
      for(int i=0;i<2;i++){
-      irsend.sendRaw(powerOn,60,38); 
+     // irsend.sendRaw(powerOn,60,38); 
       delay(402);
      }
   }
   void turnoff(const String& name,const String& data){
      digitalWrite(8,LOW);
-
+//unsigned int powerOff[60]={8400,4200,550,1600,550,550,550,500,600,500,550,1600,600,500,550,550,550,500,600,1600,550,1600,550,550,550,500,600,500,550,550,550,550,550,500,600,500,550,550,550,500,600,500,550,550,550,1600,550,550,550,1600,550,550,550,550,550,500,550,1600,600};
+Serial.println(freeRam());
      for(int i=0;i<2;i++){
-          irsend.sendRaw(powerOff,60,38); 
+        //  irsend.sendRaw(powerOff,60,38); 
           
      }
   }
   unsigned long lasttime;
 void loop() 
   {   
-    Serial.println(Pusher.connected());
+    
   //TODO checkConnected();
   //if false reconnect();
   if(!Pusher.connected()){
-      digitalWrite(9,HIGH);
+      digitalWrite(9,LOW);
       Pusher.disconnect();
       
       }else {
    // Pusher.monitor();      
-    digitalWrite(9,LOW);
+    digitalWrite(9,HIGH);
       }
     Pusher.monitor();   
 
   unsigned long time = millis();  
-    if (time > lasttime + 100000)
+    if (time > lasttime + 10000)
     {
       
-    
+    Serial.println(freeRam());
+
       lasttime = time;
       Serial.println(time);
       if(!Pusher.connected()){
