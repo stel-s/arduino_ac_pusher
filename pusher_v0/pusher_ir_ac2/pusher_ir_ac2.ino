@@ -34,7 +34,7 @@ void setup()
     // Pusher.subscribe("test_channel");
     // Pusher.bind("my_event",read);
     Pusher.subscribe("ac_channel");
-    Pusher.bind("turnon", read);
+    Pusher.bind("turnon", turnon);
     Pusher.bind("turnoff", turnoff);
     //Pusher.triggerPrivateEvent("private-ChannelName", "client-eventName", "\"\"");
     //Pusher.triggerPrivateEvent("private-ChannelName", "client-eventName", "\"1\"");
@@ -42,7 +42,7 @@ void setup()
 }
 void topntail(char *str) {
     size_t len = strlen(str);
-     // or whatever you want to do with short strings
+     
     memmove(str, str+1, len-2);
     str[len-2] = 0;
 }
@@ -75,21 +75,21 @@ void topntail(char *str) {
     
   }
   void turnon(const String& name,const String& data){
-//unsigned int powerOn[60]={8400,4200,550,1600,550,550,550,550,550,550,500,1600,550,600,500,550,550,550,550,550,500,550,550,550,550,550,500,600,500,550,550,550,550,550,500,550,550,1600,600,1550,600,1600,550,550,550,550,500,1600,600,550,500,1600,600,550,500,550,550,1600,550};
+unsigned int powerOn[60]={8400,4200,550,1600,550,550,550,550,550,550,500,1600,550,600,500,550,550,550,550,550,500,550,550,550,550,550,500,600,500,550,550,550,550,550,500,550,550,1600,600,1550,600,1600,550,550,550,550,500,1600,600,550,500,1600,600,550,500,550,550,1600,550};
 Serial.print(data);
 Serial.println(freeRam());
     digitalWrite(8,HIGH);
      for(int i=0;i<2;i++){
-     // irsend.sendRaw(powerOn,60,38); 
+     irsend.sendRaw(powerOn,60,38); 
       delay(402);
      }
   }
   void turnoff(const String& name,const String& data){
      digitalWrite(8,LOW);
-//unsigned int powerOff[60]={8400,4200,550,1600,550,550,550,500,600,500,550,1600,600,500,550,550,550,500,600,1600,550,1600,550,550,550,500,600,500,550,550,550,550,550,500,600,500,550,550,550,500,600,500,550,550,550,1600,550,550,550,1600,550,550,550,550,550,500,550,1600,600};
+unsigned int powerOff[60]={8400,4200,550,1600,550,550,550,500,600,500,550,1600,600,500,550,550,550,500,600,1600,550,1600,550,550,550,500,600,500,550,550,550,550,550,500,600,500,550,550,550,500,600,500,550,550,550,1600,550,550,550,1600,550,550,550,550,550,500,550,1600,600};
 Serial.println(freeRam());
      for(int i=0;i<2;i++){
-        //  irsend.sendRaw(powerOff,60,38); 
+         irsend.sendRaw(powerOff,60,38); 
           
      }
   }
